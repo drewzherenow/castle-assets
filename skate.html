@@ -328,7 +328,7 @@
       object-fit: contain;
       display: block;
       filter: drop-shadow(0 0 12px rgba(255,255,255,.55));
-      margin-left: -150px;
+      margin-left: 0;
     }
     .cs-footer-stack{
       display: flex;
@@ -1112,6 +1112,16 @@
           if (subscribeModal) subscribeModal.dataset.open = "true";
         });
       }
+
+      function postHeight(){
+        if (!window.parent || window.parent === window) return;
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({ type: "cs-calendar-height", height: height }, "*");
+      }
+      postHeight();
+      window.addEventListener("resize", postHeight);
+      const ro = new ResizeObserver(postHeight);
+      ro.observe(document.body);
 
       if (todayBtn){
         todayBtn.addEventListener("click", () => {
