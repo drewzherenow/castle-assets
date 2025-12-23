@@ -1,0 +1,1897 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Castle Skateland Schedule</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FullCalendar (CDN) -->
+  <link rel="stylesheet" href="https://unpkg.com/fullcalendar@6.1.15/index.global.min.css">
+
+  <style>
+    :root{
+      --neon1:#ff4fd8;   /* pink */
+      --neon2:#43d9ff;   /* blue */
+      --neon3:#ffe14d;   /* yellow */
+      --stroke:rgba(255,255,255,.18);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.72);
+      --glass:rgba(255,255,255,.10);
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(255,79,216,.20), transparent 55%),
+        radial-gradient(900px 500px at 90% -20%, rgba(67,217,255,.16), transparent 55%),
+        linear-gradient(180deg, #070b16, #0b1226 60%, #0a1224);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px;
+    }
+
+    .cs-skate-wrap{
+      color: var(--text);
+      border-radius: 26px;
+      border: 1px solid var(--stroke);
+      overflow: hidden;
+      box-shadow: 0 28px 90px rgba(0,0,0,.55);
+      background:
+        radial-gradient(1200px 600px at 15% 0%, rgba(255,79,216,.25), transparent 60%),
+        radial-gradient(1200px 600px at 90% 10%, rgba(67,217,255,.22), transparent 55%),
+        radial-gradient(900px 500px at 50% 120%, rgba(255,225,77,.18), transparent 55%),
+        linear-gradient(180deg, #090d18, #0b1123 55%, #0a1020);
+      position: relative;
+    }
+
+    /* Rink-floor checker overlay */
+    .cs-skate-wrap::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.10;
+      background:
+        linear-gradient(45deg, rgba(255,255,255,.9) 25%, transparent 25%) 0 0/28px 28px,
+        linear-gradient(-45deg, rgba(255,255,255,.9) 25%, transparent 25%) 0 0/28px 28px,
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,.9) 75%) 0 0/28px 28px,
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.9) 75%) 0 0/28px 28px;
+      mix-blend-mode: overlay;
+    }
+
+    .cs-skate-head{
+      position: relative;
+      padding: 22px 22px 14px;
+      display:flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0));
+    }
+
+    .cs-brand{
+      display:flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .cs-skate-badge{
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(67,217,255,.28), rgba(67,217,255,0) 60%),
+        radial-gradient(circle at 70% 70%, rgba(255,79,216,.22), rgba(255,79,216,0) 60%),
+        rgba(12,18,32,.65);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      backdrop-filter: blur(10px);
+    }
+
+    .cs-mascot{
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .cs-title h2{
+      margin: 0;
+      font-family: "Bebas Neue", "Space Grotesk", sans-serif;
+      font-size: clamp(22px, 3.2vw, 34px);
+      letter-spacing: 1px;
+    }
+    .cs-title p{
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .cs-title-row{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cs-title-row p{
+      margin: 0;
+    }
+    .cs-subscribe-btn{
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 12px;
+      font: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cs-subscribe-btn:hover{ background: rgba(255,255,255,.16); }
+
+    .cs-views{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 16px;
+      padding: 6px;
+      backdrop-filter: blur(10px);
+    }
+    .cs-actions{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .cs-views button{
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 600;
+      letter-spacing: .2px;
+      cursor: pointer;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
+    }
+    .cs-views button:hover{
+      background: rgba(255,255,255,.16);
+      transform: translateY(-1px);
+    }
+    .cs-views button[data-active="true"]{
+      background: linear-gradient(135deg, rgba(255,79,216,.35), rgba(67,217,255,.35));
+      border-color: rgba(255,255,255,.45);
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+    }
+
+    .cs-views button:focus-visible{
+      outline: 2px solid rgba(255,255,255,.6);
+      outline-offset: 2px;
+    }
+      border: 0;
+      background: rgba(0,0,0,.20);
+      color: rgba(255,255,255,.92);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font: inherit;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .cs-skate-body{
+      position: relative;
+      padding: 14px 14px 18px;
+    }
+
+    .cs-info-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .cs-info-card{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      padding: 14px 16px;
+      backdrop-filter: blur(10px);
+      min-height: 128px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cs-next-layout{
+      display:flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .cs-next-content{
+      flex: 1 1 auto;
+    }
+    .cs-next-image{
+      width: 96px;
+      height: 96px;
+      border-radius: 14px;
+      object-fit: contain;
+      background: rgba(0,0,0,.2);
+      border: 1px solid rgba(255,255,255,.2);
+      display: none;
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+    .cs-eyebrow{
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: rgba(255,255,255,.65);
+    }
+    .cs-next-title{
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .cs-next-time{
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .cs-help-list{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .cs-help-list li{ margin-bottom: 6px; }
+    .cs-help-list li:last-child{ margin-bottom: 0; }
+
+
+    .cs-today-btn{
+      align-self: flex-start;
+      margin-top: auto;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+    .cs-today-btn:hover{ background: rgba(255,255,255,.16); }
+
+    .cs-footer{
+      margin-top: 20px;
+      padding: 18px 20px 22px 0;
+      border-top: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.35));
+    }
+    .cs-footer-grid{
+      padding-left: 0;
+    }
+    .cs-footer-grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+    .cs-footer-contact{
+      text-align: right;
+    }
+    .cs-footer-right{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .cs-footer-contact .cs-eyebrow + .cs-eyebrow{
+      margin-top: 22px;
+    }
+    .cs-footer-brand{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+      justify-content: center;
+      align-items: flex-start;
+      padding-left: 0;
+    }
+    .cs-footer-brand p{
+      text-align: left;
+      align-self: flex-start;
+      margin-left: 0;
+      padding-left: 25px;
+    }
+    .cs-footer-block{
+      display: flex;
+      flex-direction: column;
+    }
+    .cs-footer-block + .cs-footer-block{
+      margin-top: 28px;
+    }
+    .cs-footer-right .cs-footer-block:last-child{
+      margin-top: auto;
+    }
+    .cs-footer-logo{
+      width: 100%;
+      height: 78px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 0 12px rgba(255,255,255,.55));
+      margin-left: -150px;
+    }
+    .cs-footer-stack{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cs-footer-policy{
+      display: grid;
+      gap: 4px;
+      text-align: center;
+    }
+    .cs-rental-note{
+      font-size: 12px;
+      color: rgba(255,255,255,.7);
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height .2s ease, opacity .2s ease;
+    }
+    .cs-rental-mates:hover + .cs-rental-note{
+      max-height: 80px;
+      opacity: 1;
+    }
+    .cs-hover-hint{
+      font-size: 11px;
+      color: rgba(255,255,255,.6);
+      margin-left: 4px;
+    }
+    .cs-footer-link{
+      color: #ffe14d;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 700;
+    }
+    .cs-footer p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .cs-footer strong{
+      color: var(--text);
+      font-weight: 700;
+    }
+    .cs-footer a{
+      color: #ffe14d;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .cs-footer a:hover{
+      text-decoration: underline;
+    }
+
+    #csCalendar{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 20px;
+      padding: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Bigger vertically on desktop */
+    @media (min-width: 900px){
+      #csCalendar{
+        padding: 16px;
+        min-height: 900px;
+      }
+    }
+
+    @media (max-width: 600px){
+      body{ padding: 16px; }
+      .cs-skate-head{ padding: 18px 16px 10px; }
+      .cs-skate-body{ padding: 12px 12px 16px; }
+      .cs-info-grid{ grid-template-columns: 1fr; }
+      .cs-views{ width: 100%; justify-content: space-between; }
+      .cs-actions{ width: 100%; align-items: stretch; }
+      .cs-subscribe-btn{ width: 100%; justify-content: center; }
+      .cs-footer-grid{ grid-template-columns: 1fr; }
+      .cs-footer-contact{ text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .cs-mascot{ animation: none; }
+    }
+
+    /* FullCalendar style tweaks */
+    .fc{
+      --fc-border-color: rgba(255,255,255,.16);
+      --fc-page-bg-color: transparent;
+      --fc-neutral-bg-color: rgba(255,255,255,.06);
+      --fc-today-bg-color: rgba(255,255,255,.12);
+      --fc-list-event-hover-bg-color: rgba(255,255,255,.12);
+      color: var(--text);
+    }
+    .fc .fc-scrollgrid,
+    .fc .fc-scrollgrid-section > td{
+      border-color: rgba(255,255,255,.22);
+    }
+    .fc .fc-timegrid-slot,
+    .fc .fc-daygrid-day,
+    .fc .fc-timegrid-col{
+      border-color: rgba(255,255,255,.14);
+    }
+    .fc .fc-toolbar-title{
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      text-shadow: 0 10px 35px rgba(0,0,0,.45);
+    }
+    .fc .fc-button{
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.18);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 9px 11px;
+      box-shadow: none;
+    }
+    .fc .fc-button:hover{
+      background: rgba(255,255,255,.14);
+    }
+
+    .fc .fc-button:focus-visible{
+      outline: 2px solid rgba(255,255,255,.6);
+      outline-offset: 2px;
+    }
+
+    /* Neon “ticket” event look */
+    .fc .fc-event{
+      border: 0;
+      border-radius: 12px;
+      padding: 2px 6px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.35);
+    }
+    .fc .fc-daygrid-event{
+      box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 0 18px rgba(67,217,255,.35);
+      cursor: pointer;
+    }
+    .fc .fc-daygrid-event:hover{
+      box-shadow: 0 0 0 1px rgba(255,255,255,.45), 0 0 22px rgba(255,225,77,.4);
+      transform: translateY(-1px);
+    }
+    .fc .fc-timegrid-event{
+      box-shadow: 0 0 0 1px rgba(255,255,255,.2), 0 0 18px rgba(67,217,255,.28);
+      cursor: pointer;
+    }
+    .fc .fc-timegrid-event:hover{
+      box-shadow: 0 0 0 1px rgba(255,255,255,.45), 0 0 22px rgba(255,225,77,.35);
+      transform: translateY(-1px);
+    }
+    .fc .fc-daygrid-event{
+      white-space: normal;
+      overflow: hidden;
+    }
+    .fc .fc-daygrid-event .fc-event-title{
+      white-space: normal;
+    }
+    .fc .fc-daygrid-block-event{
+      display: block;
+    }
+    .fc .fc-list-event-graphic,
+    .fc .fc-list-event-dot{
+      display: none;
+    }
+    .cs-event-chip{
+      display:flex;
+      align-items:center;
+      padding: 4px 2px;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+    }
+    .fc .fc-timegrid-event .cs-event-chip{
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .cs-event-title{
+      font-weight: 700;
+      text-align: center;
+    }
+    .cs-event-time{
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+      font-weight: 600;
+      display: block;
+      margin-top: 2px;
+      text-align: center;
+    }
+    .cs-event-price{
+      margin-left: 6px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255,225,77,.18);
+      border: 1px solid rgba(255,225,77,.45);
+      color: #ffe14d;
+      font-weight: 800;
+      letter-spacing: .2px;
+      font-size: 12px;
+    }
+    .fc .cs-all-day{
+      background: linear-gradient(135deg, rgba(255,77,77,.9), rgba(255,122,77,.85));
+    }
+    .fc .cs-closed{
+      background: linear-gradient(135deg, rgba(255,77,77,.95), rgba(255,122,77,.9));
+    }
+
+    .cs-modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 10, 20, .75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+    .cs-modal[data-open="true"]{ display: flex; }
+    .cs-modal-card{
+      width: min(520px, 92vw);
+      background: rgba(10, 16, 32, .95);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 30px 70px rgba(0,0,0,.55);
+    }
+    .cs-modal-card.cs-modal-wide{
+      width: min(720px, 94vw);
+    }
+    .cs-modal-header{
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .cs-modal-title{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+    }
+    .cs-modal-close{
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .cs-modal-body p{
+      margin: 6px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .cs-subscribe-list{
+      display: grid;
+      gap: 10px;
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .cs-subscribe-link{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.2);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .cs-subscribe-link:hover{
+      background: rgba(255,255,255,.14);
+    }
+    .cs-modal-body a{
+      color: #ffe14d;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .cs-modal-content{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cs-modal-content.cs-modal-media-right{
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .cs-modal-text{
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .cs-modal-media-right .cs-modal-image{
+      width: 180px;
+      max-height: 260px;
+    }
+    .cs-modal-image{
+      width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      background: rgba(0,0,0,.2);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.2);
+      margin: 6px 0 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="cs-skate-wrap">
+    <div class="cs-skate-head">
+      <div class="cs-brand">
+        <div class="cs-skate-badge" aria-hidden="true">
+          <img class="cs-mascot" src="https://raw.githubusercontent.com/drewzherenow/castle-assets/28061978a11416e68ff8932de7bed94502630209/MovingArmormanbest.gif" alt="">
+        </div>
+        <div class="cs-title">
+          <h2>Castle Skateland Schedule</h2>
+          <p>Tap any session for details.</p>
+        </div>
+      </div>
+
+      <div class="cs-actions">
+        <button class="cs-subscribe-btn" type="button" id="csSubscribeBtn">Subscribe to Calendar</button>
+        <div class="cs-views" role="group" aria-label="Calendar view">
+          <button type="button" data-view="list">List</button>
+          <button type="button" data-view="week">Week</button>
+          <button type="button" data-view="month">Month</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cs-skate-body">
+      <div class="cs-info-grid">
+        <div class="cs-info-card">
+          <span class="cs-eyebrow">How To Use</span>
+          <ul class="cs-help-list">
+            <li>Pick List, Week, or Month above.</li>
+            <li>Tap any session for details.</li>
+            <li>Use “Jump to Today” to reset.</li>
+          </ul>
+        </div>
+        <div class="cs-info-card">
+          <span class="cs-eyebrow">Next Session</span>
+          <div class="cs-next-layout">
+            <div class="cs-next-content">
+              <div class="cs-next-title" id="csNextTitle">Loading next session…</div>
+              <div class="cs-next-time" id="csNextTime"></div>
+            </div>
+            <img class="cs-next-image" id="csNextImage" alt="">
+          </div>
+          <button class="cs-today-btn" type="button" id="csTodayBtn">Jump to Today</button>
+        </div>
+      </div>
+      <div id="csCalendar"></div>
+    </div>
+
+    <footer class="cs-footer">
+      <div class="cs-footer-grid">
+        <div class="cs-footer-brand">
+          <img class="cs-footer-logo" src="https://img1.wsimg.com/isteam/ip/2b40de6f-a0c5-4cd7-bdc8-abb086d88aa0/CastleLogo.png/:/rs=h:175,m" alt="Castle Skateland">
+          <p>Castle Skateland in Loveland, Ohio.</p>
+        </div>
+        <div class="cs-footer-policy">
+          <span class="cs-eyebrow">House Rules</span>
+          <p>All persons 4 years of age and older must pay admission to enter.</p>
+          <p>Parents/Guardians of skaters are the only spectators allowed.</p>
+          <p>Parents/Adults who elect to skate must pay admission and skate rental.</p>
+          <p>No outside food or drink allowed in the building.</p>
+          <p>Castle Skateland is a non-smoking and non-vaping skating facility.</p>
+          <p>Castle Skateland accepts Cash &amp; all major credit cards.</p>
+          <p><a class="cs-footer-link" href="#" id="csCashLink">Castle Skateland has a Cash Discount Incentive</a></p>
+        </div>
+        <div class="cs-footer-contact cs-footer-right">
+          <div class="cs-footer-block">
+            <span class="cs-eyebrow">Rentals</span>
+            <p><strong>Skate Rental:</strong> $3.00</p>
+            <p><strong>Speed Skate Rental:</strong> $5.00</p>
+            <p class="cs-rental-mates"><strong>Skate Mates:</strong> $5.00 <span class="cs-hover-hint">hover for details</span></p>
+            <p class="cs-rental-note">Limited quantity. Available for all sessions except Wednesday &amp; Saturday Evening.</p>
+            <p>We do not rent inline skates.</p>
+          </div>
+          <div class="cs-footer-block">
+            <span class="cs-eyebrow">Contact</span>
+            <p><strong>Address:</strong> <a href="https://www.google.com/maps/search/?api=1&query=Castle%20Skateland%2C%20980%20Loveland%20Madeira%20Rd%2C%20Loveland%2C%20OH%2045140" target="_blank" rel="noopener">980 Loveland Madeira Rd, Loveland, OH 45140</a></p>
+            <p><strong>Phone:</strong> <a href="tel:+15136836666">(513) 683-6666</a></p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="cs-modal" id="csCashModal" role="dialog" aria-modal="true" aria-labelledby="csCashTitle">
+    <div class="cs-modal-card cs-modal-wide">
+      <div class="cs-modal-header">
+        <h3 class="cs-modal-title" id="csCashTitle">Cash Discount Incentive</h3>
+        <button class="cs-modal-close" type="button" id="csCashClose">Close</button>
+      </div>
+      <div class="cs-modal-body">
+        <img class="cs-modal-image" src="https://raw.githubusercontent.com/drewzherenow/castle-assets/69135a628f12af953b411b15e73ec897cbf89a40/4percent.png" alt="Castle Skateland has a cash discount incentive of 4%" style="display:block;max-height:420px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="cs-modal" id="csSubscribeModal" role="dialog" aria-modal="true" aria-labelledby="csSubscribeTitle">
+    <div class="cs-modal-card">
+      <div class="cs-modal-header">
+        <h3 class="cs-modal-title" id="csSubscribeTitle">Subscribe to the Schedule</h3>
+        <button class="cs-modal-close" type="button" id="csSubscribeClose">Close</button>
+      </div>
+      <div class="cs-modal-body">
+        <p>Pick your calendar app:</p>
+        <ul class="cs-subscribe-list">
+          <li><a class="cs-subscribe-link" href="https://calendar.google.com/calendar/u/0?cid=74dc784b8498716a556593530803c5b2e487092a4a74e4afa04f3db0731ee75c%40group.calendar.google.com" target="_blank" rel="noopener">Google Calendar<span>↗</span></a></li>
+          <li><a class="cs-subscribe-link" href="https://outlook.live.com/owa/?path=/calendar/action/compose&rru=addsubscription&url=https%3A%2F%2Ficy-hat-0b98.layman-andrew.workers.dev%2Fics&name=Castle%20Skateland%20Schedule" target="_blank" rel="noopener">Microsoft Outlook / Live<span>↗</span></a></li>
+          <li><a class="cs-subscribe-link" href="webcal://icy-hat-0b98.layman-andrew.workers.dev/ics">Apple Calendar / iCal<span>↗</span></a></li>
+          <li><a class="cs-subscribe-link" href="https://icy-hat-0b98.layman-andrew.workers.dev/ics" target="_blank" rel="noopener">Other (ICS Link)<span>↗</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="cs-modal" id="csEventModal" role="dialog" aria-modal="true" aria-labelledby="csModalTitle">
+    <div class="cs-modal-card">
+      <div class="cs-modal-header">
+        <h3 class="cs-modal-title" id="csModalTitle">
+          <span id="csModalTitleText">Session Details</span>
+          <span class="cs-event-price" id="csModalPrice"></span>
+        </h3>
+        <button class="cs-modal-close" type="button" id="csModalClose">Close</button>
+      </div>
+      <div class="cs-modal-body">
+        <p id="csModalTime"></p>
+        <div class="cs-modal-content" id="csModalContent">
+          <img class="cs-modal-image" id="csModalImage" alt="">
+          <div class="cs-modal-text">
+            <p id="csModalDescription"></p>
+            <p id="csModalLocation"></p>
+            <p id="csModalLinkWrap">
+              <a id="csModalLink" href="#" target="_blank" rel="noopener">Open in Google Calendar</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <noscript>This page requires JavaScript to load the calendar.</noscript>
+
+  <!-- FullCalendar core (GLOBAL build) -->
+  <script defer src="https://unpkg.com/fullcalendar@6.1.15/index.global.min.js"></script>
+
+  <script>
+    window.addEventListener("load", function(){
+      const ICS_FEED_URL =
+        "https://icy-hat-0b98.layman-andrew.workers.dev/ics";
+
+      const calendarEl = document.getElementById("csCalendar");
+      const viewButtons = Array.from(document.querySelectorAll(".cs-views button"));
+      const nextTitle = document.getElementById("csNextTitle");
+      const nextTime = document.getElementById("csNextTime");
+      const nextImage = document.getElementById("csNextImage");
+      const todayBtn = document.getElementById("csTodayBtn");
+      const modal = document.getElementById("csEventModal");
+      const modalTitle = document.getElementById("csModalTitle");
+      const modalTitleText = document.getElementById("csModalTitleText");
+      const modalPrice = document.getElementById("csModalPrice");
+      const modalTime = document.getElementById("csModalTime");
+      const modalImage = document.getElementById("csModalImage");
+      const modalContent = document.getElementById("csModalContent");
+      const modalDescription = document.getElementById("csModalDescription");
+      const modalLocation = document.getElementById("csModalLocation");
+      const modalLink = document.getElementById("csModalLink");
+      const modalLinkWrap = document.getElementById("csModalLinkWrap");
+      const modalClose = document.getElementById("csModalClose");
+      const cashLink = document.getElementById("csCashLink");
+      const cashModal = document.getElementById("csCashModal");
+      const cashClose = document.getElementById("csCashClose");
+      const subscribeBtn = document.getElementById("csSubscribeBtn");
+      const subscribeModal = document.getElementById("csSubscribeModal");
+      const subscribeClose = document.getElementById("csSubscribeClose");
+
+      if (!calendarEl || viewButtons.length === 0 || !window.FullCalendar){
+        if (calendarEl){
+          calendarEl.innerHTML =
+            "<div style=\"padding:16px;color:#fff;font-weight:600;\">" +
+            "Calendar failed to load. Please refresh or check your connection." +
+            "</div>";
+        }
+        return;
+      }
+
+      const storageKey = "cs_view";
+      const canStore = (() => {
+        try{
+          const test = "__cs_view_test__";
+          localStorage.setItem(test, test);
+          localStorage.removeItem(test);
+          return true;
+        } catch {
+          return false;
+        }
+      })();
+
+      const isMobile = window.matchMedia("(max-width: 600px)").matches;
+
+      const savedView = canStore ? localStorage.getItem(storageKey) : null;
+      const initialView = savedView || (isMobile ? "list" : "month");
+
+      function viewToFullCalendar(view){
+        if(view === "list") return "listMonth";
+        if(view === "week") return "timeGridWeek";
+        return "dayGridMonth";
+      }
+
+      let cachedIcsText = null;
+      let cacheTime = 0;
+      let currentViewType = viewToFullCalendar(initialView);
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        events: function(fetchInfo, successCallback, failureCallback){
+          const now = Date.now();
+          const useCache = cachedIcsText && now - cacheTime < 5 * 60 * 1000;
+
+          const handleText = (text) => {
+            const events = normalizeEventsForView(
+              parseIcs(text, fetchInfo),
+              currentViewType,
+              fetchInfo
+            );
+            successCallback(events);
+          };
+
+          if (useCache){
+            handleText(cachedIcsText);
+            return;
+          }
+
+          fetch(ICS_FEED_URL)
+            .then((response) => {
+              if (!response.ok) throw new Error("ICS fetch failed");
+              return response.text();
+            })
+            .then((text) => {
+              cachedIcsText = text;
+              cacheTime = Date.now();
+              handleText(text);
+            })
+            .catch(() => {
+              failureCallback();
+            });
+        },
+
+        initialView: viewToFullCalendar(initialView),
+        timeZone: "America/New_York",
+
+        height: "auto",
+        expandRows: true,
+
+        headerToolbar: {
+          left: "prev,next today",
+          center: "title",
+          right: ""
+        },
+
+        dayMaxEvents: true,
+        nowIndicator: true,
+        navLinks: true,
+
+        rerenderDelay: 0,
+        lazyFetching: false,
+
+        displayEventEnd: true,
+        displayEventTime: true,
+
+        eventTimeFormat: { hour: "numeric", minute: "2-digit", meridiem: "short" },
+
+        // Skate-themed event rendering
+        eventContent: function(arg){
+          const wrap = document.createElement("div");
+          wrap.className = "cs-event-chip";
+
+          const parsed = splitPrice(arg.event.title || "");
+          const text = document.createElement("span");
+          text.className = "cs-event-title";
+          text.textContent = parsed.title;
+
+          wrap.appendChild(text);
+          if (arg.view && arg.view.type === "timeGridWeek" && !arg.event.allDay){
+            const time = document.createElement("span");
+            time.className = "cs-event-time";
+            const start = arg.event.extendedProps?.actualStart || arg.event.start;
+            const end = arg.event.extendedProps?.actualEnd || arg.event.end;
+            if (start && end){
+              const startText = new Intl.DateTimeFormat("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                timeZone: "America/New_York"
+              }).format(start);
+              const endText = new Intl.DateTimeFormat("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                timeZone: "America/New_York"
+              }).format(end);
+              time.textContent = startText + " - " + endText;
+            } else if (arg.timeText){
+              time.textContent = arg.timeText;
+            }
+            wrap.appendChild(time);
+          }
+
+          return { domNodes: [wrap] };
+        },
+
+        eventClick: function(info){
+          info.jsEvent.preventDefault();
+          if (!modal) return;
+          const parsedTitle = splitPrice(info.event.title || "");
+          if (modalTitleText) modalTitleText.textContent = parsedTitle.title || "Session Details";
+          if (modalPrice){
+            modalPrice.textContent = parsedTitle.price || "";
+            modalPrice.style.display = parsedTitle.price ? "inline-flex" : "none";
+          }
+          if (modalTime) modalTime.textContent = formatEventTime(info.event);
+          if (modalImage){
+            const imageUrl = info.event.extendedProps?.imageUrl;
+            if (imageUrl){
+              modalImage.src = imageUrl;
+              modalImage.style.display = "block";
+              if (modalContent) modalContent.classList.remove("cs-modal-media-right");
+              modalImage.onload = () => {
+                if (!modalContent) return;
+                if (modalImage.naturalHeight > modalImage.naturalWidth){
+                  modalContent.classList.add("cs-modal-media-right");
+                } else {
+                  modalContent.classList.remove("cs-modal-media-right");
+                }
+              };
+            } else {
+              modalImage.style.display = "none";
+              if (modalContent) modalContent.classList.remove("cs-modal-media-right");
+            }
+          }
+          if (modalDescription){
+            const desc = cleanHtmlToText(stripImageReferences(info.event.extendedProps?.description || ""));
+            modalDescription.textContent = desc;
+            modalDescription.style.display = desc ? "block" : "none";
+          }
+          if (modalLocation){
+            const isClosed = (info.event.title || "").toLowerCase().includes("closed");
+            if (isClosed){
+              modalLocation.style.display = "none";
+            } else {
+            const locationText = info.event.extendedProps?.location || "980 Loveland Madeira Rd, Loveland, OH 45140";
+            modalLocation.innerHTML = buildLocationLink(locationText);
+            modalLocation.style.display = "block";
+            }
+          }
+          if (modalLinkWrap && modalLink){
+            if (info.event.url){
+              modalLink.href = info.event.url;
+              modalLinkWrap.style.display = "block";
+            } else {
+              modalLinkWrap.style.display = "none";
+            }
+          }
+          modal.dataset.open = "true";
+        },
+
+        eventDidMount: function(info){
+          if (info.event.allDay){
+            info.el.classList.add("cs-all-day");
+          }
+          const title = (info.event.title || "").toLowerCase();
+          if (title.includes("closed")){
+            info.el.classList.add("cs-closed");
+          }
+          if (info.view.type && info.view.type.startsWith("list")){
+            const timeEl = info.el.querySelector(".fc-list-event-time");
+            const customTime = info.event.extendedProps?.listTimeText;
+            if (timeEl && customTime){
+              timeEl.textContent = customTime;
+            }
+            const titleEl = info.el.querySelector(".fc-list-event-title");
+            const parsed = splitPrice(info.event.title || "");
+            if (titleEl){
+              titleEl.textContent = parsed.title;
+            }
+          }
+        },
+        datesSet: function(info){
+          if (currentViewType !== info.view.type){
+            currentViewType = info.view.type;
+            calendar.refetchEvents();
+          }
+        },
+
+        eventsSet: function(events){
+          const featured = getNextEventForToday(events);
+          if (nextTitle && nextTime){
+            if (!featured){
+              nextTitle.textContent = "No more sessions today";
+              nextTime.textContent = "";
+              if (nextImage) nextImage.style.display = "none";
+            } else {
+              nextTitle.textContent = featured.event.title || "Session";
+              nextTime.textContent = formatEventTime(featured.event, featured.status);
+              const imageUrl = featured.event.extendedProps?.imageUrl;
+              if (nextImage && imageUrl){
+                nextImage.src = imageUrl;
+                nextImage.style.display = "block";
+              } else if (nextImage){
+                nextImage.style.display = "none";
+              }
+            }
+          }
+        },
+
+        eventSourceFailure: function(){
+          if (nextTitle) nextTitle.textContent = "Schedule unavailable";
+          if (nextTime) nextTime.textContent = "Check the calendar link or try again later.";
+        }
+      });
+
+      calendar.render();
+
+      function setActiveView(view){
+        viewButtons.forEach((btn) => {
+          const isActive = btn.dataset.view === view;
+          btn.dataset.active = isActive ? "true" : "false";
+          btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+      }
+
+      viewButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const view = btn.dataset.view;
+          if (!view) return;
+          calendar.changeView(viewToFullCalendar(view));
+          setActiveView(view);
+          if (canStore) localStorage.setItem(storageKey, view);
+        });
+      });
+
+      setActiveView(initialView);
+      if (modalLinkWrap) modalLinkWrap.style.display = "none";
+
+      function closeModal(){
+        if (modal) modal.dataset.open = "false";
+      }
+      if (modalClose) modalClose.addEventListener("click", closeModal);
+      if (modal) modal.addEventListener("click", (event) => {
+        if (event.target === modal) closeModal();
+      });
+      function closeCashModal(){
+        if (cashModal) cashModal.dataset.open = "false";
+      }
+      if (cashClose) cashClose.addEventListener("click", closeCashModal);
+      if (cashModal) cashModal.addEventListener("click", (event) => {
+        if (event.target === cashModal) closeCashModal();
+      });
+      if (cashLink){
+        cashLink.addEventListener("click", (event) => {
+          event.preventDefault();
+          if (cashModal) cashModal.dataset.open = "true";
+        });
+      }
+      function closeSubscribeModal(){
+        if (subscribeModal) subscribeModal.dataset.open = "false";
+      }
+      if (subscribeClose) subscribeClose.addEventListener("click", closeSubscribeModal);
+      if (subscribeModal) subscribeModal.addEventListener("click", (event) => {
+        if (event.target === subscribeModal) closeSubscribeModal();
+      });
+      if (subscribeBtn){
+        subscribeBtn.addEventListener("click", () => {
+          if (subscribeModal) subscribeModal.dataset.open = "true";
+        });
+      }
+
+      if (todayBtn){
+        todayBtn.addEventListener("click", () => {
+          calendar.today();
+        });
+      }
+
+      function getNextEventForToday(events){
+        const nowEt = getNowInTimeZone();
+        const startOfDay = new Date(nowEt);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setDate(endOfDay.getDate() + 1);
+
+        const todaysEvents = events.filter((event) => {
+          const actualStart = event.extendedProps?.actualStart || event.start;
+          if (!actualStart) return false;
+          const eventStart = toTimeZoneDate(actualStart);
+          return eventStart >= startOfDay && eventStart < endOfDay;
+        });
+
+        const ongoing = todaysEvents.find((event) => {
+          const actualStart = event.extendedProps?.actualStart || event.start;
+          const actualEnd = event.extendedProps?.actualEnd || event.end;
+          const start = toTimeZoneDate(actualStart);
+          const end = actualEnd ? toTimeZoneDate(actualEnd) : null;
+          if (event.allDay) return false;
+          if (end) return start <= nowEt && end >= nowEt;
+          return start <= nowEt;
+        });
+        if (ongoing) return { event: ongoing, status: "now" };
+
+        const upcoming = todaysEvents
+          .filter((event) => {
+            const actualStart = event.extendedProps?.actualStart || event.start;
+            return toTimeZoneDate(actualStart) >= nowEt;
+          })
+          .sort((a, b) => {
+            const aStart = toTimeZoneDate(a.extendedProps?.actualStart || a.start);
+            const bStart = toTimeZoneDate(b.extendedProps?.actualStart || b.start);
+            return aStart - bStart;
+          });
+        if (!upcoming[0]) return null;
+        return { event: upcoming[0], status: "next" };
+      }
+
+      function formatEventTime(event, status){
+        const start = event.extendedProps?.actualStart || event.start;
+        const end = event.extendedProps?.actualEnd || event.end;
+        if (!start) return "";
+        if (event.allDay){
+          const day = new Intl.DateTimeFormat("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            timeZone: "America/New_York"
+          }).format(start);
+          return status === "now" ? day + " - Happening now" : day + " (All day)";
+        }
+        const datePart = new Intl.DateTimeFormat("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          timeZone: "America/New_York"
+        }).format(start);
+        const timePart = new Intl.DateTimeFormat("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          timeZone: "America/New_York"
+        }).format(start);
+        const endPart = end
+          ? " - " + new Intl.DateTimeFormat("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              timeZone: "America/New_York"
+            }).format(end)
+          : "";
+        const statusText = status === "now" ? " - Happening now" : "";
+        return datePart + " - " + timePart + endPart + statusText;
+      }
+
+      function formatListTimeText(start, end){
+        const startText = new Intl.DateTimeFormat("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          timeZone: "America/New_York"
+        }).format(start);
+        const endText = new Intl.DateTimeFormat("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          timeZone: "America/New_York"
+        }).format(end);
+        return startText + " - " + endText;
+      }
+
+      function toTimeZoneDate(date){
+        return new Date(date.toLocaleString("en-US", { timeZone: "America/New_York" }));
+      }
+
+      function getNowInTimeZone(){
+        return new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+      }
+
+
+      function parseIcs(text, fetchInfo){
+        const lines = unfoldIcs(text);
+        const events = [];
+        const rawEvents = [];
+        let current = null;
+        const rangeStart = fetchInfo?.start || new Date();
+        const rangeEnd = fetchInfo?.end || new Date(rangeStart.getTime() + 120 * 24 * 60 * 60 * 1000);
+
+        for (const line of lines){
+          if (line === "BEGIN:VEVENT"){
+            current = {};
+            continue;
+          }
+          if (line === "END:VEVENT"){
+            if (current && current.start){
+              rawEvents.push(current);
+            }
+            current = null;
+            continue;
+          }
+          if (!current) continue;
+
+          const parts = line.split(":");
+          if (parts.length < 2) continue;
+          const rawValue = parts.slice(1).join(":").trim();
+          const nameAndParams = parts[0].trim();
+          const key = nameAndParams.split(";")[0].trim().toUpperCase();
+          const params = parseParams(nameAndParams);
+          const value = unescapeIcsText(rawValue);
+
+          if (key === "SUMMARY") current.title = value;
+          if (key === "UID") current.uid = value;
+          if (key === "DTSTART"){
+            current.start = value;
+            current.startTz = params.TZID || (value.endsWith("Z") ? "UTC" : "America/New_York");
+            if (params.VALUE === "DATE") current.startAllDay = true;
+          }
+          if (key === "DTEND"){
+            current.end = value;
+            current.endTz = params.TZID || (value.endsWith("Z") ? "UTC" : current.startTz || "America/New_York");
+            if (params.VALUE === "DATE") current.endAllDay = true;
+          }
+          if (key === "RECURRENCE-ID"){
+            current.recurrenceId = value;
+            current.recurrenceTz = params.TZID || (value.endsWith("Z") ? "UTC" : "America/New_York");
+          }
+          if (key === "DESCRIPTION") current.description = value;
+          if (key === "LOCATION") current.location = value;
+          if (key === "RRULE") current.rrule = value;
+          if (key === "EXDATE") current.exdate = value;
+          if (key === "RDATE") current.rdate = value;
+          if (key === "URL") current.url = value;
+        }
+
+        const overrides = buildOverridesMap(rawEvents);
+        rawEvents.forEach((eventData) => {
+          if (eventData.recurrenceId){
+            const start = parseIcsDateParts(eventData.start, eventData.startTz, eventData.startAllDay);
+            const end = parseIcsDateParts(eventData.end, eventData.endTz || eventData.startTz, eventData.endAllDay);
+            const baseEvent = buildBaseEvent(eventData);
+            const normalizedAllDay = normalizeAllDay(start, end);
+            const single = buildEventObject(baseEvent, start, end, normalizedAllDay);
+            if (eventOverlaps(single, rangeStart, rangeEnd)) events.push(single);
+            return;
+          }
+          const expanded = expandEvent(eventData, rangeStart, rangeEnd, overrides);
+          expanded.forEach((event) => events.push(event));
+        });
+
+        return events;
+      }
+
+      function unfoldIcs(text){
+        const raw = text.split(/\r?\n/);
+        const lines = [];
+        for (const line of raw){
+          if (line.startsWith(" ") || line.startsWith("\t")){
+            if (lines.length) lines[lines.length - 1] += line.slice(1);
+          } else {
+            lines.push(line);
+          }
+        }
+        return lines;
+      }
+
+      function buildBaseEvent(data){
+        return {
+          uid: data.uid || "",
+          title: data.title || "Session",
+          description: data.description,
+          imageUrl: extractImageUrl(data.description),
+          location: data.location,
+          url: data.url
+        };
+      }
+
+      function buildOverridesMap(items){
+        const overrides = {};
+        items.forEach((item) => {
+          if (!item.recurrenceId || !item.uid) return;
+          const rec = parseIcsDateParts(item.recurrenceId, item.recurrenceTz, item.startAllDay);
+          if (!rec.date) return;
+          if (!overrides[item.uid]) overrides[item.uid] = [];
+          overrides[item.uid].push(rec.date.getTime());
+        });
+        return overrides;
+      }
+
+      function expandEvent(data, rangeStart, rangeEnd, overrides){
+        const start = parseIcsDateParts(data.start, data.startTz, data.startAllDay);
+        const end = parseIcsDateParts(data.end, data.endTz || data.startTz, data.endAllDay);
+        const baseEvent = buildBaseEvent(data);
+
+        const events = [];
+        const rrule = data.rrule ? parseRrule(data.rrule) : null;
+        const exdates = parseDateList(data.exdate, data.startTz);
+        const rdates = parseDateList(data.rdate, data.startTz);
+
+        const normalizedAllDay = normalizeAllDay(start, end);
+
+        if (!rrule && rdates.length === 0){
+          const single = buildEventObject(baseEvent, start, end, normalizedAllDay);
+          if (!rangeStart || !rangeEnd || eventOverlaps(single, rangeStart, rangeEnd)) events.push(single);
+          return events;
+        }
+
+        if (rrule && rrule.freq === "WEEKLY"){
+          const expanded = expandWeekly(start, end, rrule, rangeStart, rangeEnd, baseEvent, exdates, normalizedAllDay, overrides);
+          expanded.forEach((event) => events.push(event));
+        }
+        if (rrule && rrule.freq === "MONTHLY"){
+          const expanded = expandMonthly(start, end, rrule, rangeStart, rangeEnd, baseEvent, exdates, normalizedAllDay, overrides);
+          expanded.forEach((event) => events.push(event));
+        }
+
+        if (rdates.length){
+          rdates.forEach((date) => {
+            const rMeta = buildMetaFromDate(date);
+            const rEvent = buildEventObject(baseEvent, rMeta, end, normalizedAllDay);
+            if (!rangeStart || !rangeEnd || eventOverlaps(rEvent, rangeStart, rangeEnd)) events.push(rEvent);
+          });
+        }
+
+        return events;
+      }
+
+      function buildEventObject(base, startMeta, endMeta, allDay){
+        const startDate = startMeta?.date;
+        const endDate = endMeta?.date;
+        const startInput = buildCalendarInput(startMeta, allDay);
+        const endInput = buildCalendarInput(endMeta, allDay);
+        const event = {
+          title: base.title,
+          start: startInput,
+          allDay: allDay
+        };
+        if (endInput){
+          event.end = endInput;
+        }
+        const props = {};
+        if (base.description) props.description = base.description;
+        if (base.imageUrl) props.imageUrl = base.imageUrl;
+        if (base.location) props.location = base.location;
+        if (startDate) props.actualStart = startDate;
+        if (endDate) props.actualEnd = endDate;
+        if (Object.keys(props).length) event.extendedProps = props;
+        if (base.url) event.url = base.url;
+        return event;
+      }
+
+      function parseIcsDateParts(value, tzid, forceAllDay){
+        if (!value) return { date: null, allDay: false, midnight: false };
+        if (forceAllDay || /^\d{8}$/.test(value)){
+          const year = Number(value.slice(0, 4));
+          const month = Number(value.slice(4, 6)) - 1;
+          const day = Number(value.slice(6, 8));
+          return { date: new Date(year, month, day), allDay: true, midnight: true };
+        }
+
+        const isUtc = value.endsWith("Z") || tzid === "UTC";
+        const clean = value.replace("Z", "");
+        const year = Number(clean.slice(0, 4));
+        const month = Number(clean.slice(4, 6)) - 1;
+        const day = Number(clean.slice(6, 8));
+        const hour = Number(clean.slice(9, 11) || 0);
+        const minute = Number(clean.slice(11, 13) || 0);
+        const second = Number(clean.slice(13, 15) || 0);
+        const midnight = hour === 0 && minute === 0 && second === 0;
+        let date = null;
+
+        if (isUtc){
+          date = new Date(Date.UTC(year, month, day, hour, minute, second));
+        } else {
+          const zone = tzid || "America/New_York";
+          date = makeDateInTimeZone(year, month, day, hour, minute, second, zone);
+        }
+
+        return {
+          date: date,
+          allDay: false,
+          midnight: midnight,
+          isUtc: isUtc,
+          parts: { year: year, month: month, day: day, hour: hour, minute: minute, second: second }
+        };
+      }
+
+      function formatDateOnly(date){
+        if (!date) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return year + "-" + month + "-" + day;
+      }
+
+      function parseRrule(value){
+        const parts = value.split(";");
+        const rule = {};
+        parts.forEach((part) => {
+          const [key, val] = part.split("=");
+          rule[key.toLowerCase()] = val;
+        });
+        if (rule.freq) rule.freq = rule.freq.toUpperCase();
+        if (rule.interval) rule.interval = Number(rule.interval) || 1;
+        if (rule.count) rule.count = Number(rule.count);
+        if (rule.until) rule.until = parseIcsDateParts(rule.until).date;
+        if (rule.byday) rule.byday = rule.byday.split(",").map(parseByday).filter(Boolean);
+        if (rule.bymonthday){
+          rule.bymonthday = rule.bymonthday
+            .split(",")
+            .map((day) => Number(day))
+            .filter((day) => !Number.isNaN(day));
+        }
+        if (rule.bysetpos) rule.bysetpos = Number(rule.bysetpos);
+        return rule;
+      }
+
+      function parseByday(code){
+        const match = String(code).match(/^([+-]?\d+)?(SU|MO|TU|WE|TH|FR|SA)$/);
+        if (!match) return null;
+        const map = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+        return {
+          weekday: map[match[2]],
+          pos: match[1] ? Number(match[1]) : null
+        };
+      }
+
+      function expandWeekly(start, end, rrule, rangeStart, rangeEnd, baseEvent, exdates, allDay, overrides){
+        const interval = rrule.interval || 1;
+        const bydays = rrule.byday && rrule.byday.length
+          ? rrule.byday.map((item) => item.weekday)
+          : [start.date.getDay()];
+        const until = rrule.until ? new Date(rrule.until) : null;
+        const occurrences = [];
+        let count = 0;
+
+        const startDate = start.date;
+        if (!startDate) return occurrences;
+        const startDay = new Date(startDate);
+        startDay.setHours(0, 0, 0, 0);
+
+        const cursor = rangeStart ? new Date(rangeStart) : new Date(startDate);
+        cursor.setHours(0, 0, 0, 0);
+        const endCursor = rangeEnd ? new Date(rangeEnd) : new Date(startDate.getTime() + 120 * 24 * 60 * 60 * 1000);
+
+        while (cursor <= endCursor){
+          const diffDays = Math.floor((cursor - startDay) / (1000 * 60 * 60 * 24));
+          const weekIndex = Math.floor(diffDays / 7);
+          const matchesInterval = diffDays >= 0 && weekIndex % interval === 0;
+
+          if (matchesInterval && bydays.includes(cursor.getDay())){
+            const occurrenceStart = new Date(cursor);
+            occurrenceStart.setHours(startDate.getHours(), startDate.getMinutes(), startDate.getSeconds(), 0);
+
+            if (until && occurrenceStart > until) break;
+            if (!isExcluded(occurrenceStart, exdates, allDay) && !isOverride(occurrenceStart, baseEvent.uid, overrides, allDay)){
+              const duration = end.date ? end.date - start.date : 0;
+              const occurrenceEnd = duration ? new Date(occurrenceStart.getTime() + duration) : null;
+              const startMeta = buildMetaFromDate(occurrenceStart);
+              const endMeta = occurrenceEnd ? buildMetaFromDate(occurrenceEnd) : end;
+              const event = buildEventObject(baseEvent, startMeta, endMeta, allDay);
+              if (!rangeStart || !rangeEnd || eventOverlaps(event, rangeStart, rangeEnd)) occurrences.push(event);
+              count += 1;
+              if (rrule.count && count >= rrule.count) break;
+            }
+          }
+
+          cursor.setDate(cursor.getDate() + 1);
+        }
+
+        if (occurrences.length === 0 && start.date){
+          const startMeta = start;
+          const endMeta = end.date ? end : null;
+          const fallback = buildEventObject(baseEvent, startMeta, endMeta, allDay);
+          if (!rangeStart || !rangeEnd || eventOverlaps(fallback, rangeStart, rangeEnd)){
+            occurrences.push(fallback);
+          }
+        }
+
+        return occurrences;
+      }
+
+      function expandMonthly(start, end, rrule, rangeStart, rangeEnd, baseEvent, exdates, allDay, overrides){
+        const interval = rrule.interval || 1;
+        const occurrences = [];
+        let count = 0;
+        const startDate = start.date;
+        if (!startDate) return occurrences;
+        const until = rrule.until ? new Date(rrule.until) : null;
+
+        const rangeStartDate = rangeStart ? new Date(rangeStart) : new Date(startDate);
+        const rangeEndDate = rangeEnd ? new Date(rangeEnd) : new Date(startDate.getTime() + 400 * 24 * 60 * 60 * 1000);
+
+        const startMonthIndex = startDate.getFullYear() * 12 + startDate.getMonth();
+        const cursor = new Date(rangeStartDate.getFullYear(), rangeStartDate.getMonth(), 1);
+
+        while (cursor <= rangeEndDate){
+          const cursorMonthIndex = cursor.getFullYear() * 12 + cursor.getMonth();
+          const monthDiff = cursorMonthIndex - startMonthIndex;
+          const matchesInterval = monthDiff >= 0 && monthDiff % interval === 0;
+
+          if (matchesInterval){
+            const occurrenceStart = buildMonthlyOccurrence(startDate, cursor, rrule);
+            if (occurrenceStart){
+              if (until && occurrenceStart > until){
+                break;
+              }
+              if (!isExcluded(occurrenceStart, exdates, allDay) && !isOverride(occurrenceStart, baseEvent.uid, overrides, allDay)){
+                const duration = end.date ? end.date - start.date : 0;
+                const occurrenceEnd = duration ? new Date(occurrenceStart.getTime() + duration) : null;
+                const startMeta = buildMetaFromDate(occurrenceStart);
+                const endMeta = occurrenceEnd ? buildMetaFromDate(occurrenceEnd) : end;
+                const event = buildEventObject(baseEvent, startMeta, endMeta, allDay);
+                if (!rangeStart || !rangeEnd || eventOverlaps(event, rangeStart, rangeEnd)){
+                  occurrences.push(event);
+                  count += 1;
+                  if (rrule.count && count >= rrule.count) break;
+                }
+              }
+            }
+          }
+
+          cursor.setMonth(cursor.getMonth() + 1);
+        }
+
+        return occurrences;
+      }
+
+      function buildMonthlyOccurrence(startDate, monthCursor, rrule){
+        const year = monthCursor.getFullYear();
+        const month = monthCursor.getMonth();
+        const startHours = startDate.getHours();
+        const startMinutes = startDate.getMinutes();
+        const startSeconds = startDate.getSeconds();
+
+        if (rrule.bymonthday && rrule.bymonthday.length){
+          const day = rrule.bymonthday[0];
+          const occurrence = new Date(year, month, day, startHours, startMinutes, startSeconds, 0);
+          if (occurrence.getMonth() !== month) return null;
+          return occurrence;
+        }
+
+        if (rrule.byday && rrule.byday.length){
+          const byday = rrule.byday[0];
+          const weekday = byday.weekday;
+          const pos = byday.pos || rrule.bysetpos || 1;
+          if (pos){
+            const occurrence = nthWeekdayOfMonth(year, month, weekday, pos);
+            if (!occurrence) return null;
+            occurrence.setHours(startHours, startMinutes, startSeconds, 0);
+            return occurrence;
+          }
+        }
+
+        const day = startDate.getDate();
+        const fallback = new Date(year, month, day, startHours, startMinutes, startSeconds, 0);
+        if (fallback.getMonth() !== month) return null;
+        return fallback;
+      }
+
+      function nthWeekdayOfMonth(year, month, weekday, nth){
+        if (nth === 0) return null;
+        if (nth > 0){
+          const first = new Date(year, month, 1);
+          const firstDay = first.getDay();
+          const diff = (weekday - firstDay + 7) % 7;
+          const day = 1 + diff + (nth - 1) * 7;
+          const date = new Date(year, month, day);
+          return date.getMonth() === month ? date : null;
+        }
+        if (nth < 0){
+          const last = new Date(year, month + 1, 0);
+          const lastDay = last.getDay();
+          const diff = (lastDay - weekday + 7) % 7;
+          const day = last.getDate() - diff + (nth + 1) * 7;
+          const date = new Date(year, month, day);
+          return date.getMonth() === month ? date : null;
+        }
+        return null;
+      }
+
+      function parseDateList(value, tzid){
+        if (!value) return [];
+        return value.split(",").map((entry) => parseIcsDateParts(entry, tzid).date).filter(Boolean);
+      }
+
+      function isExcluded(date, exdates, allDay){
+        if (!exdates.length) return false;
+        return exdates.some((exdate) => {
+          if (allDay){
+            return formatDateOnly(exdate) === formatDateOnly(date);
+          }
+          return exdate.getTime() === date.getTime();
+        });
+      }
+
+      function isOverride(date, uid, overrides, allDay){
+        if (!uid || !overrides || !overrides[uid]) return false;
+        if (allDay){
+          return overrides[uid].some((overrideTime) => {
+            const overrideDate = new Date(overrideTime);
+            return formatDateOnly(overrideDate) === formatDateOnly(date);
+          });
+        }
+        return overrides[uid].includes(date.getTime());
+      }
+
+      function eventOverlaps(event, rangeStart, rangeEnd){
+        const actualStart = event.extendedProps?.actualStart || event.start;
+        const actualEnd = event.extendedProps?.actualEnd || event.end;
+        const eventStart = event.allDay
+          ? toAllDayDate(actualStart)
+          : new Date(actualStart);
+        const eventEnd = actualEnd
+          ? (event.allDay ? toAllDayDate(actualEnd) : new Date(actualEnd))
+          : eventStart;
+
+        return eventEnd >= rangeStart && eventStart <= rangeEnd;
+      }
+
+      function toAllDayDate(value){
+        if (value instanceof Date) return value;
+        return new Date(value + "T00:00:00");
+      }
+
+      function parseParams(nameAndParams){
+        const params = {};
+        const parts = nameAndParams.split(";").slice(1);
+        parts.forEach((part) => {
+          const [key, val] = part.split("=");
+          if (key && val) params[key.toUpperCase()] = val;
+        });
+        return params;
+      }
+
+      function makeDateInTimeZone(year, month, day, hour, minute, second, timeZone){
+        const utcGuess = Date.UTC(year, month, day, hour, minute, second);
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: timeZone,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        }).formatToParts(new Date(utcGuess));
+        const map = {};
+        parts.forEach((part) => {
+          if (part.type !== "literal") map[part.type] = part.value;
+        });
+        const asUtc = Date.UTC(
+          Number(map.year),
+          Number(map.month) - 1,
+          Number(map.day),
+          Number(map.hour),
+          Number(map.minute),
+          Number(map.second)
+        );
+        const offset = utcGuess - asUtc;
+        return new Date(utcGuess + offset);
+      }
+
+
+      function normalizeAllDay(start, end){
+        if (start.allDay) return true;
+        if (!start.date || !end.date) return false;
+        if (!start.midnight || !end.midnight) return false;
+        const duration = end.date - start.date;
+        return duration > 0 && duration % (24 * 60 * 60 * 1000) === 0;
+      }
+
+      function normalizeEventsForView(events, viewType, fetchInfo){
+        if (viewType && viewType.startsWith("list")){
+          const now = new Date();
+          const rangeStart = fetchInfo?.start || null;
+          const rangeEnd = fetchInfo?.end || null;
+          const filtered = events
+            .map((event) => {
+              const actualStart = event.extendedProps?.actualStart || event.start;
+              const actualEnd = event.extendedProps?.actualEnd || event.end;
+              if (!actualStart) return event;
+              const start = actualStart instanceof Date ? actualStart : new Date(actualStart);
+              const end = actualEnd
+                ? (actualEnd instanceof Date ? actualEnd : new Date(actualEnd))
+                : start;
+              if (!event.allDay && start.toDateString() !== end.toDateString()){
+                const listTimeText = formatListTimeText(start, end);
+                return {
+                  ...event,
+                  end: null,
+                  extendedProps: {
+                    ...event.extendedProps,
+                    listTimeText: listTimeText
+                  }
+                };
+              }
+              return event;
+            })
+            .filter((event) => {
+              const actualStart = event.extendedProps?.actualStart || event.start;
+              const actualEnd = event.extendedProps?.actualEnd || event.end;
+              const start = actualStart instanceof Date ? actualStart : new Date(actualStart);
+              const end = actualEnd
+                ? (actualEnd instanceof Date ? actualEnd : new Date(actualEnd))
+                : start;
+              if (rangeStart && rangeEnd){
+                if (end < rangeStart || start >= rangeEnd) return false;
+                if (rangeStart <= now && rangeEnd >= now){
+                  return end >= now;
+                }
+                return true;
+              }
+              return end >= now;
+            });
+          return filtered;
+        }
+        if (!viewType || !viewType.startsWith("dayGrid")){
+          return events;
+        }
+        return events.map((event) => {
+          if (!event.end || event.allDay) return event;
+          const start = event.extendedProps?.actualStart || new Date(event.start);
+          const end = event.extendedProps?.actualEnd || new Date(event.end);
+          if (
+            start.getFullYear() === end.getFullYear() &&
+            start.getMonth() === end.getMonth() &&
+            start.getDate() === end.getDate()
+          ){
+            return event;
+          }
+          const clampedEnd = new Date(start);
+          clampedEnd.setHours(23, 59, 0, 0);
+          const updated = { ...event, end: clampedEnd };
+          if (event.extendedProps){
+            updated.extendedProps = { ...event.extendedProps, actualEnd: event.extendedProps.actualEnd || event.end };
+          }
+          return updated;
+        });
+      }
+
+      function unescapeIcsText(value){
+        return String(value)
+          .replace(/\\\\/g, "\\")
+          .replace(/\\n/gi, "\n")
+          .replace(/\\,/g, ",")
+          .replace(/\\;/g, ";");
+      }
+
+      function cleanHtmlToText(value){
+        if (!value) return "";
+        return String(value)
+          .replace(/<\s*br\s*\/?>/gi, "\n")
+          .replace(/<\/p>/gi, "\n")
+          .replace(/<li>/gi, "• ")
+          .replace(/<\/li>/gi, "\n")
+          .replace(/<[^>]*>/g, "")
+          .replace(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)(\?[^\s"']*)?/gi, "")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+      }
+
+      function splitPrice(title){
+        const match = String(title).match(/^(.*?)(?:\s*-\s*(\$[0-9][0-9.,]*\s*adm\.?))$/i);
+        if (match){
+          return { title: match[1].trim(), price: match[2].trim() };
+        }
+        const generic = String(title).match(/^(.*?)(?:\s*-\s*(\$[0-9][0-9.,]*.*))$/i);
+        if (generic){
+          return { title: generic[1].trim(), price: generic[2].trim() };
+        }
+        return { title: title, price: "" };
+      }
+
+      function extractImageUrl(value){
+        if (!value) return "";
+        const text = String(value);
+        const imgTagMatch = text.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (imgTagMatch && imgTagMatch[1]) return imgTagMatch[1];
+        const linkMatch = text.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i);
+        return linkMatch ? linkMatch[0] : "";
+      }
+
+      function stripImageReferences(value){
+        if (!value) return "";
+        return String(value)
+          .replace(/<img[^>]*>/gi, "")
+          .replace(/<a[^>]+href=["'][^"']+\.(?:png|jpe?g|gif|webp)(\?[^"']*)?["'][^>]*>.*?<\/a>/gi, "")
+          .replace(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)(\?[^\s"']*)?/gi, "");
+      }
+
+      function buildMetaFromDate(date){
+        if (!date) return { date: null, allDay: false, midnight: false, isUtc: false, parts: null };
+        const parts = getDatePartsInZone(date, "America/New_York");
+        return {
+          date: date,
+          allDay: false,
+          midnight: parts.hour === 0 && parts.minute === 0 && parts.second === 0,
+          isUtc: false,
+          parts: parts
+        };
+      }
+
+      function getDatePartsInZone(date, timeZone){
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: timeZone,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        }).formatToParts(date);
+        const map = {};
+        parts.forEach((part) => {
+          if (part.type !== "literal") map[part.type] = part.value;
+        });
+        return {
+          year: Number(map.year),
+          month: Number(map.month) - 1,
+          day: Number(map.day),
+          hour: Number(map.hour),
+          minute: Number(map.minute),
+          second: Number(map.second)
+        };
+      }
+
+      function buildCalendarInput(meta, allDay){
+        if (!meta || !meta.date) return "";
+        if (allDay) return formatDateOnly(meta.date);
+        if (meta.isUtc){
+          const localParts = getDatePartsInZone(meta.date, "America/New_York");
+          return formatDateTimeParts(localParts);
+        }
+        if (!meta.parts) return meta.date;
+        return formatDateTimeParts(meta.parts);
+      }
+
+      function formatDateTimeParts(parts){
+        const year = parts.year;
+        const month = String(parts.month + 1).padStart(2, "0");
+        const day = String(parts.day).padStart(2, "0");
+        const hour = String(parts.hour).padStart(2, "0");
+        const minute = String(parts.minute).padStart(2, "0");
+        const second = String(parts.second).padStart(2, "0");
+        return year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+      }
+
+      function buildLocationLink(locationText){
+        const safeText = locationText
+          .replace(/<[^>]*>/g, "")
+          .replace(/,\s*USA\b/gi, "");
+        const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(safeText);
+        return "Location: <a href=\"" + url + "\" target=\"_blank\" rel=\"noopener\">" + safeText + "</a>";
+      }
+    });
+  </script>
+</body>
+</html>
