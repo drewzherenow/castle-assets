@@ -2,12 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1020">
+  <meta name="application-name" content="Castle Skateland">
+  <meta name="apple-mobile-web-app-title" content="Castle Skateland">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
   <title>Castle Skateland Schedule</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="manifest" href="skate.webmanifest">
+  <link rel="apple-touch-icon" href="4percent.png">
 
   <!-- FullCalendar (CDN) -->
   <link rel="stylesheet" href="https://unpkg.com/fullcalendar@6.1.15/index.global.min.css">
@@ -34,7 +43,11 @@
         linear-gradient(180deg, #070b16, #0b1226 60%, #0a1224);
       color: var(--text);
       min-height: 100vh;
+      min-height: 100dvh;
       padding: 28px;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     .cs-skate-wrap{
@@ -247,6 +260,13 @@
       color: var(--muted);
       font-size: 14px;
     }
+    .cs-next-countdown{
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffe14d;
+      letter-spacing: .3px;
+    }
     .cs-help-list{
       margin: 0;
       padding-left: 18px;
@@ -255,6 +275,26 @@
     }
     .cs-help-list li{ margin-bottom: 6px; }
     .cs-help-list li:last-child{ margin-bottom: 0; }
+    .cs-help-toggle{
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
+    .cs-help-toggle-text{
+      font-size: 12px;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
 
 
     .cs-today-btn{
@@ -399,8 +439,16 @@
     }
 
     @media (max-width: 600px){
-      body{ padding: 16px; }
-      .cs-skate-head{ padding: 18px 16px 10px; }
+      body{
+        padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      }
+      .cs-skate-head{
+        padding: calc(14px + env(safe-area-inset-top)) 16px 10px;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        backdrop-filter: blur(12px);
+      }
       .cs-skate-body{ padding: 12px 12px 16px; }
       .cs-info-grid{ grid-template-columns: 1fr; }
       .cs-views{ width: 100%; justify-content: space-between; }
@@ -408,6 +456,81 @@
       .cs-subscribe-btn{ width: 100%; justify-content: center; }
       .cs-footer-grid{ grid-template-columns: 1fr; }
       .cs-footer-contact{ text-align: left; }
+      .cs-help-list{
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height .25s ease, opacity .2s ease;
+      }
+      .cs-help-card{
+        background: transparent;
+        border: 0;
+        padding: 0;
+        min-height: 0;
+        box-shadow: none;
+      }
+      .cs-help-card[data-open="true"]{
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 18px;
+        padding: 14px 16px;
+      }
+      .cs-help-card[data-open="true"] .cs-help-list{
+        max-height: 200px;
+        opacity: 1;
+      }
+
+      #csEventModal{
+        align-items: flex-end;
+        background: rgba(6, 10, 20, .85);
+        backdrop-filter: blur(4px);
+      }
+      #csEventModal .cs-modal-card{
+        width: 100%;
+        max-width: 600px;
+        border-radius: 20px 20px 0 0;
+        padding: 0 0 max(18px, env(safe-area-inset-bottom));
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 -10px 40px rgba(0,0,0,.5);
+      }
+      #csEventModal .cs-modal-handle{
+        display: block;
+      }
+      #csEventModal .cs-modal-header{
+        padding: 0 20px 14px;
+        border-bottom: 1px solid rgba(255,255,255,.1);
+      }
+      #csEventModal .cs-modal-close{
+        display: none;
+      }
+      #csEventModal .cs-modal-body{
+        padding: 18px 20px;
+        overflow-y: auto;
+        flex: 1 1 auto;
+      }
+      #csEventModal .cs-modal-content{
+        flex-direction: column;
+        flex: 1 1 auto;
+      }
+      #csEventModal .cs-modal-image{
+        width: 100%;
+        max-height: 260px;
+        margin: 4px 0 12px;
+      }
+      #csEventModal .cs-modal-text{
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+      }
+      #csEventModal #csModalLinkWrap{
+        display: none !important;
+      }
+      #csEventModal .cs-modal-actions{
+        display: grid;
+        margin-top: auto;
+      }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -534,6 +657,29 @@
     .fc .cs-closed{
       background: linear-gradient(135deg, rgba(255,77,77,.95), rgba(255,122,77,.9));
     }
+    .fc .cs-closed-day{
+      background: rgba(255, 77, 77, .16);
+    }
+    .fc .cs-closed-label{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 77, 77, .22);
+      border: 1px solid rgba(255, 77, 77, .45);
+      color: #ffd2c8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .fc .fc-timegrid-col{
+      position: relative;
+    }
 
     .cs-modal{
       position: fixed;
@@ -553,6 +699,14 @@
       border-radius: 18px;
       padding: 18px;
       box-shadow: 0 30px 70px rgba(0,0,0,.55);
+    }
+    .cs-modal-handle{
+      display: none;
+      width: 36px;
+      height: 4px;
+      background: rgba(255,255,255,.3);
+      border-radius: 2px;
+      margin: 8px auto 12px;
     }
     .cs-modal-card.cs-modal-wide{
       width: min(720px, 94vw);
@@ -584,6 +738,31 @@
       margin: 6px 0;
       color: var(--muted);
       font-size: 14px;
+    }
+    .cs-modal-actions{
+      display: none;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .cs-modal-btn{
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .cs-modal-btn.primary{
+      background: linear-gradient(135deg, rgba(255,79,216,.4), rgba(67,217,255,.4));
+      border-color: rgba(255,255,255,.3);
     }
     .cs-subscribe-list{
       display: grid;
@@ -667,9 +846,12 @@
 
     <div class="cs-skate-body">
       <div class="cs-info-grid">
-        <div class="cs-info-card">
-          <span class="cs-eyebrow">How To Use</span>
-          <ul class="cs-help-list">
+        <div class="cs-info-card cs-help-card">
+          <button class="cs-help-toggle" type="button" id="csHelpToggle" aria-expanded="false" aria-controls="csHelpList">
+            <span class="cs-eyebrow">How To Use</span>
+            <span class="cs-help-toggle-text">Tap to view</span>
+          </button>
+          <ul class="cs-help-list" id="csHelpList" aria-hidden="true">
             <li>Pick List, Week, or Month above.</li>
             <li>Tap any session for details.</li>
             <li>Use “Jump to Today” to reset.</li>
@@ -681,6 +863,7 @@
             <div class="cs-next-content">
               <div class="cs-next-title" id="csNextTitle">Loading next session…</div>
               <div class="cs-next-time" id="csNextTime"></div>
+              <div class="cs-next-countdown" id="csNextCountdown"></div>
             </div>
             <img class="cs-next-image" id="csNextImage" alt="">
           </div>
@@ -753,6 +936,7 @@
 
   <div class="cs-modal" id="csEventModal" role="dialog" aria-modal="true" aria-labelledby="csModalTitle">
     <div class="cs-modal-card">
+      <div class="cs-modal-handle" aria-hidden="true"></div>
       <div class="cs-modal-header">
         <h3 class="cs-modal-title" id="csModalTitle">
           <span id="csModalTitleText">Session Details</span>
@@ -770,6 +954,10 @@
             <p id="csModalLinkWrap">
               <a id="csModalLink" href="#" target="_blank" rel="noopener">Open in Google Calendar</a>
             </p>
+            <div class="cs-modal-actions" id="csModalActions">
+              <button class="cs-modal-btn primary" type="button" id="csModalCloseAlt">Close</button>
+              <a class="cs-modal-btn" id="csModalLinkMobile" href="#" target="_blank" rel="noopener">Open in Google Calendar</a>
+            </div>
           </div>
         </div>
       </div>
@@ -790,7 +978,13 @@
       const viewButtons = Array.from(document.querySelectorAll(".cs-views button"));
       const nextTitle = document.getElementById("csNextTitle");
       const nextTime = document.getElementById("csNextTime");
+      const nextCountdown = document.getElementById("csNextCountdown");
       const nextImage = document.getElementById("csNextImage");
+      let nextEventRef = null;
+      let nextEventStatus = null;
+      let countdownTimer = null;
+      let nextSessionEvents = [];
+      let nextSessionRefreshTimer = null;
       const todayBtn = document.getElementById("csTodayBtn");
       const modal = document.getElementById("csEventModal");
       const modalTitle = document.getElementById("csModalTitle");
@@ -803,7 +997,12 @@
       const modalLocation = document.getElementById("csModalLocation");
       const modalLink = document.getElementById("csModalLink");
       const modalLinkWrap = document.getElementById("csModalLinkWrap");
+      const modalActions = document.getElementById("csModalActions");
+      const modalLinkMobile = document.getElementById("csModalLinkMobile");
       const modalClose = document.getElementById("csModalClose");
+      const modalCloseAlt = document.getElementById("csModalCloseAlt");
+      const helpToggle = document.getElementById("csHelpToggle");
+      const helpList = document.getElementById("csHelpList");
       const cashLink = document.getElementById("csCashLink");
       const cashModal = document.getElementById("csCashModal");
       const cashClose = document.getElementById("csCashClose");
@@ -987,12 +1186,20 @@
             modalLocation.style.display = "block";
             }
           }
-          if (modalLinkWrap && modalLink){
+          if (modalLinkWrap && modalLink && !isMobile){
             if (info.event.url){
               modalLink.href = info.event.url;
               modalLinkWrap.style.display = "block";
             } else {
               modalLinkWrap.style.display = "none";
+            }
+          }
+          if (modalActions && modalLinkMobile && isMobile){
+            if (info.event.url){
+              modalLinkMobile.href = info.event.url;
+              modalLinkMobile.style.display = "flex";
+            } else {
+              modalLinkMobile.style.display = "none";
             }
           }
           modal.dataset.open = "true";
@@ -1024,27 +1231,12 @@
             currentViewType = info.view.type;
             calendar.refetchEvents();
           }
+          applyClosedDayHighlights([], info.view.type);
         },
 
         eventsSet: function(events){
-          const featured = getNextEventForToday(events);
-          if (nextTitle && nextTime){
-            if (!featured){
-              nextTitle.textContent = "No more sessions today";
-              nextTime.textContent = "";
-              if (nextImage) nextImage.style.display = "none";
-            } else {
-              nextTitle.textContent = featured.event.title || "Session";
-              nextTime.textContent = formatEventTime(featured.event, featured.status);
-              const imageUrl = featured.event.extendedProps?.imageUrl;
-              if (nextImage && imageUrl){
-                nextImage.src = imageUrl;
-                nextImage.style.display = "block";
-              } else if (nextImage){
-                nextImage.style.display = "none";
-              }
-            }
-          }
+          refreshNextSessionFromFeed();
+          applyClosedDayHighlights(events, calendar.view.type);
         },
 
         eventSourceFailure: function(){
@@ -1075,14 +1267,40 @@
 
       setActiveView(initialView);
       if (modalLinkWrap) modalLinkWrap.style.display = "none";
+      if (modalLinkMobile) modalLinkMobile.style.display = "none";
 
       function closeModal(){
         if (modal) modal.dataset.open = "false";
       }
       if (modalClose) modalClose.addEventListener("click", closeModal);
+      if (modalCloseAlt) modalCloseAlt.addEventListener("click", closeModal);
       if (modal) modal.addEventListener("click", (event) => {
         if (event.target === modal) closeModal();
       });
+
+      if (helpToggle && helpList){
+        const helpCard = helpToggle.closest(".cs-help-card");
+        if (helpCard){
+          if (isMobile){
+            helpCard.dataset.open = "false";
+            helpToggle.setAttribute("aria-expanded", "false");
+            helpList.setAttribute("aria-hidden", "true");
+          } else {
+            helpCard.dataset.open = "true";
+            helpToggle.setAttribute("aria-expanded", "true");
+            helpList.setAttribute("aria-hidden", "false");
+          }
+        }
+        helpToggle.addEventListener("click", () => {
+          if (!isMobile) return;
+          const card = helpToggle.closest(".cs-help-card");
+          if (!card) return;
+          const isOpen = card.dataset.open === "true";
+          card.dataset.open = isOpen ? "false" : "true";
+          helpToggle.setAttribute("aria-expanded", isOpen ? "false" : "true");
+          helpList.setAttribute("aria-hidden", isOpen ? "true" : "false");
+        });
+      }
       function closeCashModal(){
         if (cashModal) cashModal.dataset.open = "false";
       }
@@ -1125,43 +1343,105 @@
         });
       }
 
-      function getNextEventForToday(events){
+      function setNextSession(events){
         const nowEt = getNowInTimeZone();
-        const startOfDay = new Date(nowEt);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(startOfDay);
-        endOfDay.setDate(endOfDay.getDate() + 1);
+        let ongoing = null;
+        const upcoming = [];
 
-        const todaysEvents = events.filter((event) => {
+        events.forEach((event) => {
+          const title = (event.title || "").toLowerCase();
+          if (title.includes("closed")) return;
           const actualStart = event.extendedProps?.actualStart || event.start;
-          if (!actualStart) return false;
-          const eventStart = toTimeZoneDate(actualStart);
-          return eventStart >= startOfDay && eventStart < endOfDay;
-        });
-
-        const ongoing = todaysEvents.find((event) => {
-          const actualStart = event.extendedProps?.actualStart || event.start;
+          if (!actualStart) return;
           const actualEnd = event.extendedProps?.actualEnd || event.end;
           const start = toTimeZoneDate(actualStart);
           const end = actualEnd ? toTimeZoneDate(actualEnd) : null;
-          if (event.allDay) return false;
-          if (end) return start <= nowEt && end >= nowEt;
-          return start <= nowEt;
-        });
-        if (ongoing) return { event: ongoing, status: "now" };
 
-        const upcoming = todaysEvents
-          .filter((event) => {
-            const actualStart = event.extendedProps?.actualStart || event.start;
-            return toTimeZoneDate(actualStart) >= nowEt;
-          })
-          .sort((a, b) => {
-            const aStart = toTimeZoneDate(a.extendedProps?.actualStart || a.start);
-            const bStart = toTimeZoneDate(b.extendedProps?.actualStart || b.start);
-            return aStart - bStart;
-          });
-        if (!upcoming[0]) return null;
-        return { event: upcoming[0], status: "next" };
+          if (!event.allDay && end && start <= nowEt && end >= nowEt){
+            if (!ongoing || end < toTimeZoneDate(ongoing.extendedProps?.actualEnd || ongoing.end)){
+              ongoing = event;
+            }
+            return;
+          }
+          if (start >= nowEt){
+            upcoming.push(event);
+          }
+        });
+
+        upcoming.sort((a, b) => {
+          const aStart = toTimeZoneDate(a.extendedProps?.actualStart || a.start);
+          const bStart = toTimeZoneDate(b.extendedProps?.actualStart || b.start);
+          return aStart - bStart;
+        });
+
+        const featured = upcoming[0] ? { event: upcoming[0], status: "next" } : (ongoing ? { event: ongoing, status: "now" } : null);
+        if (nextTitle && nextTime && nextCountdown){
+          if (!featured){
+            nextTitle.textContent = "No upcoming sessions";
+            nextTime.textContent = "";
+            nextCountdown.textContent = "";
+            nextEventRef = null;
+            nextEventStatus = null;
+            if (nextImage) nextImage.style.display = "none";
+          } else {
+            nextTitle.textContent = featured.event.title || "Session";
+            nextTime.textContent = formatEventTime(featured.event, featured.status);
+            nextEventRef = featured.event;
+            nextEventStatus = featured.status;
+            updateCountdown();
+            const imageUrl = featured.event.extendedProps?.imageUrl;
+            if (nextImage && imageUrl){
+              nextImage.src = imageUrl;
+              nextImage.style.display = "block";
+            } else if (nextImage){
+              nextImage.style.display = "none";
+            }
+          }
+        }
+      }
+
+      function updateCountdown(){
+        if (!nextCountdown) return;
+        if (!nextEventRef){
+          nextCountdown.textContent = "";
+          return;
+        }
+        const nowEt = getNowInTimeZone();
+        const actualStart = nextEventRef.extendedProps?.actualStart || nextEventRef.start;
+        const actualEnd = nextEventRef.extendedProps?.actualEnd || nextEventRef.end;
+        const start = actualStart ? toTimeZoneDate(actualStart) : null;
+        const end = actualEnd ? toTimeZoneDate(actualEnd) : null;
+        let label = "Starts in";
+        let target = start;
+        if (nextEventStatus === "now" && end){
+          label = "Ends in";
+          target = end;
+        }
+        if (!target){
+          nextCountdown.textContent = "";
+          return;
+        }
+        const diffMs = target - nowEt;
+        if (diffMs <= 0){
+          nextCountdown.textContent = nextEventStatus === "now" ? "Ending now" : "Starting now";
+          return;
+        }
+        nextCountdown.textContent = label + " " + formatCountdown(diffMs);
+      }
+
+      function formatCountdown(diffMs){
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        if (days > 0){
+          return days + "d " + hours + "h " + String(minutes).padStart(2, "0") + "m";
+        }
+        if (hours > 0){
+          return hours + "h " + String(minutes).padStart(2, "0") + "m";
+        }
+        return minutes + "m " + String(seconds).padStart(2, "0") + "s";
       }
 
       function formatEventTime(event, status){
@@ -1199,18 +1479,111 @@
         return datePart + " - " + timePart + endPart + statusText;
       }
 
+      function refreshNextSessionFromFeed(){
+        const now = Date.now();
+        const useCache = cachedIcsText && now - cacheTime < 5 * 60 * 1000;
+        const handleText = (text) => {
+          const rangeStart = new Date(Date.now() - 24 * 60 * 60 * 1000);
+          const rangeEnd = new Date(Date.now() + 400 * 24 * 60 * 60 * 1000);
+          nextSessionEvents = parseIcs(text, { start: rangeStart, end: rangeEnd });
+          setNextSession(nextSessionEvents);
+        };
+        if (useCache){
+          handleText(cachedIcsText);
+          return;
+        }
+        fetch(ICS_FEED_URL)
+          .then((response) => {
+            if (!response.ok) throw new Error("ICS fetch failed");
+            return response.text();
+          })
+          .then((text) => {
+            cachedIcsText = text;
+            cacheTime = Date.now();
+            handleText(text);
+          })
+          .catch(() => {
+            if (nextTitle) nextTitle.textContent = "Schedule unavailable";
+            if (nextTime) nextTime.textContent = "Check the calendar link or try again later.";
+            if (nextCountdown) nextCountdown.textContent = "";
+            nextEventRef = null;
+            nextEventStatus = null;
+          });
+      }
+
+      if (countdownTimer) clearInterval(countdownTimer);
+      countdownTimer = setInterval(updateCountdown, 1000);
+      if (nextSessionRefreshTimer) clearInterval(nextSessionRefreshTimer);
+      nextSessionRefreshTimer = setInterval(() => {
+        if (nextSessionEvents.length){
+          setNextSession(nextSessionEvents);
+        } else {
+          refreshNextSessionFromFeed();
+        }
+      }, 60 * 1000);
+      refreshNextSessionFromFeed();
+
       function formatListTimeText(start, end){
-        const startText = new Intl.DateTimeFormat("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          timeZone: "America/New_York"
-        }).format(start);
-        const endText = new Intl.DateTimeFormat("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          timeZone: "America/New_York"
-        }).format(end);
-        return startText + " - " + endText;
+        const formatTime = (date) => {
+          const parts = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "America/New_York"
+          }).formatToParts(date);
+
+          const hourPart = parts.find(p => p.type === "hour");
+          const minutePart = parts.find(p => p.type === "minute");
+          const dayPeriodPart = parts.find(p => p.type === "dayPeriod");
+
+          const hour = hourPart ? hourPart.value : "";
+          const minute = minutePart ? minutePart.value : "00";
+          const ampm = dayPeriodPart ? dayPeriodPart.value.toLowerCase() : "";
+
+          return minute === "00" ? `${hour}${ampm}` : `${hour}:${minute}${ampm}`;
+        };
+        return formatTime(start) + "-" + formatTime(end);
+      }
+
+      function applyClosedDayHighlights(events, viewType){
+        if (!calendarEl) return;
+        const timegridCols = calendarEl.querySelectorAll(".fc-timegrid-col");
+        timegridCols.forEach((cell) => cell.classList.remove("cs-closed-day"));
+        timegridCols.forEach((cell) => {
+          const label = cell.querySelector(".cs-closed-label");
+          if (label) label.remove();
+        });
+
+        if (viewType !== "timeGridWeek") return;
+        const closedByDate = new Map();
+        events.forEach((event) => {
+          if (!event.allDay) return;
+          const title = event.title || "";
+          if (!title.toLowerCase().includes("closed")) return;
+          const actualStart = event.extendedProps?.actualStart || event.start;
+          if (!actualStart) return;
+          const startDate = actualStart instanceof Date ? actualStart : new Date(actualStart);
+          const parts = getDatePartsInZone(startDate, "America/New_York");
+          const localDate = makeDateInTimeZone(parts.year, parts.month, parts.day, 0, 0, 0, "America/New_York");
+          const dateKey = formatDateOnly(localDate);
+          if (!closedByDate.has(dateKey)) closedByDate.set(dateKey, title);
+        });
+
+        if (!closedByDate.size) return;
+        const applyToCell = (cell) => {
+          const dateKey = cell.getAttribute("data-date");
+          if (!dateKey || !closedByDate.has(dateKey)) return;
+          cell.classList.add("cs-closed-day");
+          let label = cell.querySelector(".cs-closed-label");
+          if (!label){
+            label = document.createElement("div");
+            label.className = "cs-closed-label";
+            label.textContent = closedByDate.get(dateKey);
+            cell.appendChild(label);
+          }
+        };
+
+        timegridCols.forEach(applyToCell);
       }
 
       function toTimeZoneDate(date){
@@ -1715,48 +2088,7 @@
 
       function normalizeEventsForView(events, viewType, fetchInfo){
         if (viewType && viewType.startsWith("list")){
-          const now = new Date();
-          const rangeStart = fetchInfo?.start || null;
-          const rangeEnd = fetchInfo?.end || null;
-          const filtered = events
-            .map((event) => {
-              const actualStart = event.extendedProps?.actualStart || event.start;
-              const actualEnd = event.extendedProps?.actualEnd || event.end;
-              if (!actualStart) return event;
-              const start = actualStart instanceof Date ? actualStart : new Date(actualStart);
-              const end = actualEnd
-                ? (actualEnd instanceof Date ? actualEnd : new Date(actualEnd))
-                : start;
-              if (!event.allDay && start.toDateString() !== end.toDateString()){
-                const listTimeText = formatListTimeText(start, end);
-                return {
-                  ...event,
-                  end: null,
-                  extendedProps: {
-                    ...event.extendedProps,
-                    listTimeText: listTimeText
-                  }
-                };
-              }
-              return event;
-            })
-            .filter((event) => {
-              const actualStart = event.extendedProps?.actualStart || event.start;
-              const actualEnd = event.extendedProps?.actualEnd || event.end;
-              const start = actualStart instanceof Date ? actualStart : new Date(actualStart);
-              const end = actualEnd
-                ? (actualEnd instanceof Date ? actualEnd : new Date(actualEnd))
-                : start;
-              if (rangeStart && rangeEnd){
-                if (end < rangeStart || start >= rangeEnd) return false;
-                if (rangeStart <= now && rangeEnd >= now){
-                  return end >= now;
-                }
-                return true;
-              }
-              return end >= now;
-            });
-          return filtered;
+          return events;
         }
         if (!viewType || !viewType.startsWith("dayGrid")){
           return events;
